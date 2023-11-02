@@ -32,7 +32,8 @@ public class ExampleProducer {
      */
     public static void main(String[] args) {
 
-        String topic = "a_Topic1";
+        String topic = args[0];
+        Integer numRecords = Integer.parseInt(args[1]);
 
         Properties defaults = new Properties();
         Config external = new Config();
@@ -75,7 +76,7 @@ public class ExampleProducer {
         Properties props = buildProducerConfig();
         Producer<String, String> producer = new KafkaProducer<>(props);
 
-        for (int i = 0; ; i++) {
+        for (int i = 0; i < numRecords; i++) {
             try {
 
                 producer.send(new ProducerRecord<>(topic, "Message " + i))
@@ -97,7 +98,7 @@ public class ExampleProducer {
             }
 
             try {
-                Thread.sleep(20000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new RuntimeException("Interrupted while sleeping!");
             }
