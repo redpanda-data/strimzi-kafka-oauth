@@ -90,8 +90,7 @@ public class ExampleProducer {
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof AuthenticationException
                         || e.getCause() instanceof AuthorizationException) {
-                    producer.close();
-                    producer = new KafkaProducer<>(props);
+                    throw e;
                 } else {
                     throw new RuntimeException("Failed to send message: " + i, e);
                 }
