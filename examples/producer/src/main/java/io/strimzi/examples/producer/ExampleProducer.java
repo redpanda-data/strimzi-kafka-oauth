@@ -30,7 +30,7 @@ public class ExampleProducer {
      *
      * @param args No arguments expected
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException {
 
         String topic = args[0];
         Integer numRecords = Integer.parseInt(args[1]);
