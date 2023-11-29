@@ -35,7 +35,8 @@ public class ExampleConsumer {
      */
     public static void main(String[] args) {
 
-        String topic = "a_Topic1";
+        String topic = args[0];
+        Integer numRecords = Integer.parseInt(args[1]);
 
         Properties defaults = new Properties();
         Config external = new Config();
@@ -76,16 +77,22 @@ public class ExampleConsumer {
         ConfigProperties.resolveAndExportToSystemProperties(defaults);
 
         Properties props = buildConsumerConfig();
+        System.out.println("Properties: " + props);
         Consumer<String, String> consumer = new KafkaConsumer<>(props);
 
-        for (int i = 0; ; i++) {
+        long timeoutMillis = Long.parseLong(props.getProperty(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG));
+        long startTime = System.currentTimeMillis();
+        int i = 0;
+        while (i < numRecords && System.currentTimeMillis() - startTime < timeoutMillis) {
             try {
                 consumer.subscribe(Arrays.asList(topic));
 
-                while (true) {
+                while (System.currentTimeMillis() - startTime < timeoutMillis) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
+                    System.out.println("Consumed records: " + records.count());
                     for (ConsumerRecord<String, String> record : records) {
                         System.out.println("Consumed message - " + i + ": " + record.value());
+                        ++i;
                     }
                 }
             } catch (InterruptException e) {
@@ -130,6 +137,8 @@ public class ExampleConsumer {
         p.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "a_consumer-group");
         p.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10");
         p.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
+
+        p.setProperty(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "30000");
 
         return ConfigProperties.resolve(p);
     }
