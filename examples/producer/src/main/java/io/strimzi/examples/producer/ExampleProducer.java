@@ -30,7 +30,7 @@ public class ExampleProducer {
      *
      * @param args No arguments expected
      */
-    public static void main(String[] args) throws ExecutionException {
+    public static void main(String[] args) {
 
         String topic = args[0];
         Integer numRecords = Integer.parseInt(args[1]);
@@ -90,7 +90,7 @@ public class ExampleProducer {
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof AuthenticationException
                         || e.getCause() instanceof AuthorizationException) {
-                    throw e;
+                    throw new RuntimeException(e);
                 } else {
                     throw new RuntimeException("Failed to send message: " + i, e);
                 }
